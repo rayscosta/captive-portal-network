@@ -1,0 +1,11 @@
+{
+    "name": "cpn-agent",
+    "version": "0.1.0",
+    "type": "module",
+    "bin": {
+        "cpn-agent": "index.js"
+    },
+    "dependencies": {
+        "node-fetch": "^3.3.2"
+    }
+}
