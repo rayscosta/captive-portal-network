@@ -5,6 +5,7 @@
 - Utilize **async/await** para operações assíncronas, evitando callbacks e `.then()`.
 - Sempre utilize nomes de variáveis em **inglês**.
 - As explicações e comentários de código devem ser feitas em **português**.
+- Utilize **Programação Orientada a Objetos (POO)**: estruture o backend em camadas com `Repositories` (acesso a dados), `Services` (regras de negócio) e `Controllers` (camada web), evitando lógica de negócio dentro de rotas.
 
 
 # Contexto do Projeto: Sistema de Gerenciamento de Ativos e Captive Portal
