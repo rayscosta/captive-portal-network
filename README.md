@@ -2,7 +2,12 @@
 
 Sistema acadêmico de gerenciamento de ativos de TI e captive portal com autenticação social.
 
-## Como rodar
+## 📋 Documentação
+
+- **[Instruções para GitHub Copilot](.github/copilot-instructions.md)** - Regras de negócio detalhadas e orientações de desenvolvimento
+- **[Documentação Técnica](docs/)** - Arquitetura, APIs, modelos de domínio e fluxos
+
+## 🚀 Como rodar
 
 1. Copie `.env.example` para `.env` e ajuste valores.
 2. Instale as dependências com npm.
