@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Captive Portal Network</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-network-wired"></i>
+            <h2>CPN Admin</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#assets" class="nav-item" data-section="assets">
+                <i class="fas fa-server"></i>
+                <span>Ativos</span>
+            </a>
+            <a href="#commands" class="nav-item" data-section="commands">
+                <i class="fas fa-terminal"></i>
+                <span>Comandos</span>
+            </a>
+        </nav>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span>Administrador</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <h1 id="page-title">Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i>
+                    Atualizar
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-assets">0</h3>
+                        <p>Total de Ativos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="online-assets">0</h3>
+                        <p>Ativos Online</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pending-commands">0</h3>
+                        <p>Comandos Pendentes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completed-commands">0</h3>
+                        <p>Comandos Executados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Atividade Recente</h3>
+                <div class="activity-list" id="recent-activity">
+                    <div class="activity-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Carregando atividades...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assets Section -->
+        <section id="assets" class="content-section">
+            <div class="section-header">
+                <h3>Gestão de Ativos</h3>
+                <button class="btn btn-success" id="add-asset-btn">
+                    <i class="fas fa-plus"></i>
+                    Novo Ativo
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>IP</th>
+                            <th>MAC</th>
+                            <th>Status</th>
+                            <th>Última Conexão</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assets-table">
+                        <tr>
+                            <td colspan="7" class="text-center">Carregando ativos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Commands Section -->
+        <section id="commands" class="content-section">
+            <div class="section-header">
+                <h3>Histórico de Comandos</h3>
+                <div class="command-actions">
+                    <select id="asset-select" class="form-control">
+                        <option value="">Selecione um ativo</option>
+                    </select>
+                    <select id="command-select" class="form-control">
+                        <option value="UNAME">UNAME</option>
+                        <option value="DF">DF</option>
+                        <option value="UPTIME">UPTIME</option>
+                        <option value="LSROOT">LSROOT</option>
+                    </select>
+                    <button class="btn btn-primary" id="send-command-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Comando
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Comando</th>
+                            <th>Status</th>
+                            <th>Criado em</th>
+                            <th>Resultado</th>
+                            <th>Executado em</th>
+                        </tr>
+                    </thead>
+                    <tbody id="commands-table">
+                        <tr>
+                            <td colspan="6" class="text-center">Carregando comandos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Ativo -->
+    <div id="asset-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Novo Ativo</h3>
+                <span class="close" id="close-modal">&times;</span>
+            </div>
+            <form id="asset-form">
+                <div class="form-group">
+                    <label for="asset-name">Nome:</label>
+                    <input type="text" id="asset-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="asset-type">Tipo:</label>
+                    <select id="asset-type" name="type" required>
+                        <option value="linux">Linux</option>
+                        <option value="windows">Windows</option>
+                        <option value="router">Router</option>
+                        <option value="switch">Switch</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="asset-ip">IP:</label>
+                    <input type="text" id="asset-ip" name="ip" placeholder="192.168.1.100">
+                </div>
+                <div class="form-group">
+                    <label for="asset-mac">MAC:</label>
+                    <input type="text" id="asset-mac" name="mac" placeholder="00:11:22:33:44:55">
+                </div>
+                <div class="form-group">
+                    <label for="asset-token">Token do Agente:</label>
+                    <input type="text" id="asset-token" name="agentToken" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-btn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -9,3 +9,10 @@ export const basicAuthMiddleware = (req, res, next) => {
   if (user === process.env.ADMIN_BASIC_USER && pass === process.env.ADMIN_BASIC_PASS) return next()
   return res.status(403).json({ error: 'Forbidden' })
 }
+
+// Comentário: middleware para permitir acesso à interface admin sem autenticação
+export const adminPageMiddleware = (req, res, next) => {
+  // Se for uma requisição para a pasta admin, permitir acesso direto
+  if (req.path.startsWith('/admin')) return next()
+  return basicAuthMiddleware(req, res, next)
+}
