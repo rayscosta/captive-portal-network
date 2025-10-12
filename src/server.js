@@ -35,14 +35,16 @@ app.get('/health', (_req, res) => {
 
 // Inicialização do servidor
 const port = process.env.PORT || 3000
-ensureDatabase()
-  .then(() => {
-    app.listen(port, () => {
-      // Comentário: servidor iniciado com sucesso
-      console.log(`Server running on http://localhost:${port}`)
-    })
+
+try {
+  // Comentário: inicializa o banco de dados de forma síncrona (better-sqlite3)
+  ensureDatabase()
+  
+  app.listen(port, () => {
+    // Comentário: servidor iniciado com sucesso
+    console.log(`Server running on http://localhost:${port}`)
   })
-  .catch((err) => {
-    console.error('Failed to initialize database', err)
-    process.exit(1)
-  })
+} catch (err) {
+  console.error('Failed to initialize database', err)
+  process.exit(1)
+}

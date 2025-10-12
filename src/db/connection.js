@@ -1,19 +1,22 @@
-import { open } from 'sqlite'
-import sqlite3 from 'sqlite3'
+import Database from 'better-sqlite3'
 
 const dbPath = process.env.DATABASE_PATH || './database.sqlite'
 
-export const getDb = async () => {
-  // Comentário: abre conexão com SQLite usando Promises
-  const db = await open({ filename: dbPath, driver: sqlite3.Database })
-  await db.exec('PRAGMA foreign_keys = ON;')
-  return db
+let dbInstance = null
+
+export const getDb = () => {
+  // Comentário: abre conexão com SQLite de forma síncrona (better-sqlite3 é síncrono por design)
+  if (!dbInstance) {
+    dbInstance = new Database(dbPath)
+    dbInstance.pragma('foreign_keys = ON')
+  }
+  return dbInstance
 }
 
-export const ensureDatabase = async () => {
-  const db = await getDb()
+export const ensureDatabase = () => {
+  const db = getDb()
   // Comentário: cria tabelas se não existirem
-  await db.exec(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       provider TEXT NOT NULL,
@@ -77,5 +80,5 @@ export const ensureDatabase = async () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `)
-  await db.close()
+  // Comentário: better-sqlite3 mantém a conexão aberta; não precisa fechar aqui
 }
