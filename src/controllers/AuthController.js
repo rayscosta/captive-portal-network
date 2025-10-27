@@ -1,5 +1,5 @@
-import { AuthService } from '../services/AuthService.js'
 import { AuditService } from '../services/AuditService.js'
+import { AuthService } from '../services/AuthService.js'
 
 export class AuthController {
   authService = new AuthService()
@@ -85,7 +85,7 @@ export class AuthController {
         return res.status(403).json({ error: 'Acesso negado' })
       }
 
-      res.json(user)
+      res.json({ user })
     } catch (e) {
       res.status(500).json({ error: 'Erro ao verificar autenticação' })
     }
