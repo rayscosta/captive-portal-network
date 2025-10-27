@@ -9,6 +9,7 @@ import { agentRouter } from './routes/agent.js'
 import { assetsRouter } from './routes/assets.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
+import { usersRouter } from './routes/users.js'
 
 // Configurações iniciais
 const app = express()
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')))
 app.use('/api/assets', assetsRouter)
 app.use('/api/commands', commandsRouter)
 app.use('/api/agent', agentRouter)
+app.use('/api/users', usersRouter)
 app.use('/auth', captiveRouter)
 
 // Healthcheck
