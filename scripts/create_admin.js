@@ -8,7 +8,7 @@
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getDb, ensureDatabase } from '../src/db/connection.js';
+import { ensureDatabase, getDb } from '../src/db/connection.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

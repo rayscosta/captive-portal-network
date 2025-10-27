@@ -6,6 +6,14 @@ Sistema acadêmico de gerenciamento de ativos de TI e captive portal com autenti
 
 - **[Instruções para GitHub Copilot](.github/copilot-instructions.md)** - Regras de negócio detalhadas e orientações de desenvolvimento
 - **[Documentação Técnica](docs/)** - Arquitetura, APIs, modelos de domínio e fluxos
+- **[Documentação da API (Swagger)](docs/API_DOCUMENTATION.md)** - Guia completo da API REST com OpenAPI/Swagger
+
+### 📖 Swagger/OpenAPI Interactive Docs
+
+Após iniciar o servidor, acesse a documentação interativa da API:
+
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
 
 ## 🚀 Como rodar
 

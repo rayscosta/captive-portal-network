@@ -5,7 +5,7 @@
  * Adiciona colunas 'role' e 'password' à tabela users
  */
 
-import { getDb, ensureDatabase } from '../src/db/connection.js';
+import { ensureDatabase, getDb } from '../src/db/connection.js';
 
 const migrate = async () => {
     try {

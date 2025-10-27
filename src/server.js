@@ -4,6 +4,8 @@ import express from 'express'
 import morgan from 'morgan'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './config/swagger.js'
 import { ensureDatabase } from './db/connection.js'
 import { agentRouter } from './routes/agent.js'
 import { assetsRouter } from './routes/assets.js'
@@ -22,6 +24,18 @@ app.use(morgan('dev'))
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 app.use(express.static(path.join(__dirname, '..', 'public')))
+
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'CPN API Documentation'
+}))
+
+// Endpoint para baixar spec OpenAPI
+app.get('/api-docs.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpec)
+})
 
 // Rotas principais
 app.use('/api/auth', authRouter)
