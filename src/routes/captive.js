@@ -29,6 +29,10 @@ captiveRouter.get('/callback', async (req, res) => {
   try {
     const { provider = 'google', state, code, ip, mac } = req.query
     if (!state) return res.status(400).json({ error: 'Missing state' })
+    
+    // Comentário: captura user-agent para rastreamento (RF1.5)
+    const userAgent = req.headers['user-agent'] || 'unknown'
+    
     const db = await getDb()
     const sc = await db.get('SELECT * FROM state_challenges WHERE state = ?', [state])
     if (!sc) {
@@ -49,9 +53,11 @@ captiveRouter.get('/callback', async (req, res) => {
     )
     const userId = userResult.lastID
     const ttlMinutes = Number(process.env.SESSION_TTL_MINUTES || 60)
+    
+    // Comentário: armazena user_agent na sessão conforme RF1.5
     await db.run(
-      'INSERT INTO captive_sessions (user_id, ip, mac, expires_at) VALUES (?, ?, ?, datetime("now", ?))',
-      [userId, ip || sc.ip, mac || sc.mac, `+${ttlMinutes} minutes`]
+      'INSERT INTO captive_sessions (user_id, ip, mac, user_agent, expires_at) VALUES (?, ?, ?, ?, datetime("now", ?))',
+      [userId, ip || sc.ip, mac || sc.mac, userAgent, `+${ttlMinutes} minutes`]
     )
 
     // Executa script shell para liberar acesso

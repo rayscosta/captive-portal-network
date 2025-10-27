@@ -56,6 +56,7 @@ export const ensureDatabase = async () => {
       user_id INTEGER,
       ip TEXT,
       mac TEXT,
+      user_agent TEXT,
       started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       expires_at DATETIME,
       FOREIGN KEY(user_id) REFERENCES users(id)
