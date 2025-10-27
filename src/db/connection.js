@@ -20,6 +20,8 @@ export const ensureDatabase = async () => {
       provider_id TEXT NOT NULL,
       name TEXT,
       email TEXT,
+      password TEXT,
+      role TEXT DEFAULT 'user',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 

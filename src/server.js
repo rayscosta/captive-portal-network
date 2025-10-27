@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { ensureDatabase } from './db/connection.js'
 import { agentRouter } from './routes/agent.js'
 import { assetsRouter } from './routes/assets.js'
+import { authRouter } from './routes/auth.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
 import { usersRouter } from './routes/users.js'
@@ -23,6 +24,7 @@ const __dirname = path.dirname(__filename)
 app.use(express.static(path.join(__dirname, '..', 'public')))
 
 // Rotas principais
+app.use('/api/auth', authRouter)
 app.use('/api/assets', assetsRouter)
 app.use('/api/commands', commandsRouter)
 app.use('/api/agent', agentRouter)

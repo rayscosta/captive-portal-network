@@ -77,9 +77,19 @@ body {
     padding: 1.5rem;
     border-top: 1px solid rgba(232, 245, 232, 0.15);
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
     color: rgba(232, 245, 232, 0.75);
+    font-size: 0.875rem;
+}
+
+.user-info span {
+    display: block;
+}
+
+.user-info button {
+    margin-top: 0.5rem;
+    width: 100%;
 }
 
 /* Main Content */

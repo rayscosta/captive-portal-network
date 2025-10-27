@@ -1,6 +1,6 @@
 import { AssetRepository } from '../repositories/AssetRepository.js'
-import { CommandService } from '../services/CommandService.js'
 import { AuditService } from '../services/AuditService.js'
+import { CommandService } from '../services/CommandService.js'
 
 export class AgentController {
   service = new CommandService()

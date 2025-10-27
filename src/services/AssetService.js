@@ -1,11 +1,11 @@
 import { AssetRepository } from '../repositories/AssetRepository.js'
 import {
-  generateSecureToken,
-  isValidAssetType,
-  isValidIP,
-  isValidMAC,
-  normalizeMAC,
-  sanitizeString,
+    generateSecureToken,
+    isValidAssetType,
+    isValidIP,
+    isValidMAC,
+    normalizeMAC,
+    sanitizeString,
 } from '../utils/validators.js'
 
 export class AssetService {

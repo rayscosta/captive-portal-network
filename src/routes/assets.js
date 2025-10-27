@@ -1,21 +1,21 @@
 import { Router } from 'express'
 import { AssetController } from '../controllers/AssetController.js'
-import { basicAuthMiddleware } from '../utils/auth.js'
+import { jwtAuthMiddleware } from '../utils/auth.js'
 
 export const assetsRouter = Router()
 const controller = new AssetController()
 
 // Lista ativos
-assetsRouter.get('/', basicAuthMiddleware, controller.list)
+assetsRouter.get('/', jwtAuthMiddleware, controller.list)
 
 // Cria ativo
-assetsRouter.post('/', basicAuthMiddleware, controller.create)
+assetsRouter.post('/', jwtAuthMiddleware, controller.create)
 
 // Detalhe de ativo
-assetsRouter.get('/:id', basicAuthMiddleware, controller.get)
+assetsRouter.get('/:id', jwtAuthMiddleware, controller.get)
 
 // Atualiza ativo
-assetsRouter.put('/:id', basicAuthMiddleware, controller.update)
+assetsRouter.put('/:id', jwtAuthMiddleware, controller.update)
 
 // Remove ativo
-assetsRouter.delete('/:id', basicAuthMiddleware, controller.remove)
+assetsRouter.delete('/:id', jwtAuthMiddleware, controller.remove)
