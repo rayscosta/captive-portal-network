@@ -74,7 +74,9 @@ const formatDate = (dateString) => {
 const getStatusBadge = (status) => {
     const badges = {
         'PENDING': '<span class="status-badge status-pending">Pendente</span>',
+        'EXECUTING': '<span class="status-badge status-executing">Executando</span>',
         'DONE': '<span class="status-badge status-done">Concluído</span>',
+        'FAILED': '<span class="status-badge status-failed">Falhou</span>',
         'online': '<span class="status-badge status-online">Online</span>',
         'offline': '<span class="status-badge status-offline">Offline</span>'
     };
@@ -414,20 +416,27 @@ const renderCommandsTable = () => {
 const sendCommand = async () => {
     const assetId = document.getElementById('asset-select').value;
     const code = document.getElementById('command-select').value;
+    const timeoutSeconds = parseInt(document.getElementById('timeout-input').value) || 30;
 
     if (!assetId || !code) {
         showNotification('Selecione um ativo e um comando', 'error');
         return;
     }
 
+    if (timeoutSeconds < 5 || timeoutSeconds > 300) {
+        showNotification('Timeout deve estar entre 5 e 300 segundos', 'error');
+        return;
+    }
+
     try {
         await apiRequest('/api/commands', {
             method: 'POST',
-            body: JSON.stringify({ assetId: parseInt(assetId), code })
+            body: JSON.stringify({ assetId: parseInt(assetId), code, timeoutSeconds })
         });
         
         showNotification('Comando enviado com sucesso', 'success');
         document.getElementById('asset-select').value = '';
+        document.getElementById('timeout-input').value = '30';
         loadCommands();
         
         // Update dashboard if visible

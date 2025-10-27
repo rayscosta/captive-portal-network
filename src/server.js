@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
 import { usersRouter } from './routes/users.js'
+import { TimeoutMonitorService } from './services/TimeoutMonitorService.js'
 
 // Configurações iniciais
 const app = express()
@@ -53,14 +54,32 @@ app.get('/health', (_req, res) => {
 
 // Inicialização do servidor
 const port = process.env.PORT || 3000
+const timeoutMonitor = new TimeoutMonitorService()
+
 ensureDatabase()
   .then(() => {
     app.listen(port, () => {
       // Comentário: servidor iniciado com sucesso
       console.log(`Server running on http://localhost:${port}`)
+      
+      // Iniciar monitor de timeouts de comandos
+      timeoutMonitor.start()
     })
   })
   .catch((err) => {
     console.error('Failed to initialize database', err)
     process.exit(1)
   })
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recebido, encerrando gracefully...')
+  timeoutMonitor.stop()
+  process.exit(0)
+})
+
+process.on('SIGINT', () => {
+  console.log('\nSIGINT recebido, encerrando gracefully...')
+  timeoutMonitor.stop()
+  process.exit(0)
+})

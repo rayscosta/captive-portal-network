@@ -420,22 +420,28 @@ body {
     border: 1px solid #ffb74d;
 }
 
-.status-blocked {
-    background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-    color: #ad1457;
-    border: 1px solid #f06292;
-}
-
-.status-pending {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    color: #e65100;
-    border: 1px solid #ffb74d;
+.status-executing {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #0d47a1;
+    border: 1px solid #64b5f6;
 }
 
 .status-done {
     background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
     color: #1b5e20;
     border: 1px solid #81c784;
+}
+
+.status-failed {
+    background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+    color: #b71c1c;
+    border: 1px solid #e57373;
+}
+
+.status-blocked {
+    background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+    color: #ad1457;
+    border: 1px solid #f06292;
 }
 
 /* Modal */
