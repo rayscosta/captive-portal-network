@@ -1,11 +1,22 @@
 import { Router } from 'express'
 import { execFile } from 'node:child_process'
 import crypto from 'node:crypto'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { getDb } from '../db/connection.js'
 
 const execFileAsync = promisify(execFile)
 export const captiveRouter = Router()
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Comentário: serve página principal do captive portal
+captiveRouter.get('/', (req, res) => {
+  const publicPath = path.join(__dirname, '../../public/index.html')
+  res.sendFile(publicPath)
+})
 
 // Inicia OAuth - cria state vinculado a IP/MAC
 captiveRouter.get('/login/:provider', async (req, res) => {

@@ -3,14 +3,259 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Captive Portal</title>
+    <title>Wi-Fi Grátis - Captive Portal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 440px;
+        width: 100%;
+        padding: 40px;
+        text-align: center;
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+      }
+
+      h1 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .device-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 30px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .device-info .label {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .login-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-google {
+        background: white;
+        color: #333;
+        border: 2px solid #e0e0e0;
+      }
+
+      .btn-google:hover {
+        background: #f8f9fa;
+        border-color: #ccc;
+      }
+
+      .btn-facebook {
+        background: #1877f2;
+        color: white;
+      }
+
+      .btn-facebook:hover {
+        background: #166fe5;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 13px;
+        color: #888;
+      }
+
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 480px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .btn {
+          padding: 14px 20px;
+          font-size: 15px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Captive Portal</h1>
-    <p>Faça login para continuar:</p>
-    <ul>
-      <li><a href="/auth/login/google">Login com Google</a></li>
-      <li><a href="/auth/login/facebook">Login com Facebook</a></li>
-    </ul>
+    <div class="container">
+      <div class="logo">📶</div>
+      <h1>Wi-Fi Grátis Disponível</h1>
+      <p class="subtitle">
+        Conecte-se à internet fazendo login com uma de suas redes sociais
+      </p>
+
+      <div class="device-info" id="device-info">
+        <div class="label">Dispositivo:</div>
+        <div id="device-type">Carregando...</div>
+      </div>
+
+      <div class="login-buttons">
+        <a href="#" class="btn btn-google" id="btn-google">
+          <span class="icon">G</span>
+          <span>Continuar com Google</span>
+        </a>
+        <a href="#" class="btn btn-facebook" id="btn-facebook">
+          <span class="icon">f</span>
+          <span>Continuar com Facebook</span>
+        </a>
+      </div>
+
+      <div class="footer">
+        <p>
+          Ao conectar, você concorda com nossos<br />
+          <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Comentário: detecta tipo de dispositivo e configura links OAuth
+      (function() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        let deviceType = 'Desktop';
+        
+        // Detecção de dispositivo mobile
+        if (/android/i.test(userAgent)) {
+          deviceType = '📱 Android';
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+          deviceType = '📱 iOS (iPhone/iPad)';
+        } else if (/tablet|ipad/i.test(userAgent)) {
+          deviceType = '📱 Tablet';
+        } else if (/mobile/i.test(userAgent)) {
+          deviceType = '📱 Mobile';
+        } else {
+          deviceType = '💻 Desktop/Laptop';
+        }
+        
+        document.getElementById('device-type').textContent = deviceType;
+        
+        // Comentário: preserva URL original e parâmetros IP/MAC da query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const originalUrl = urlParams.get('url') || window.location.href;
+        const ip = urlParams.get('ip') || '';
+        const mac = urlParams.get('mac') || '';
+        
+        // Armazena URL original para redirecionamento pós-autenticação
+        if (originalUrl) {
+          sessionStorage.setItem('captive_original_url', originalUrl);
+        }
+        
+        // Constrói URLs de autenticação com parâmetros
+        const buildAuthUrl = (provider) => {
+          const params = new URLSearchParams();
+          if (ip) params.append('ip', ip);
+          if (mac) params.append('mac', mac);
+          return `/captive/login/${provider}?${params.toString()}`;
+        };
+        
+        document.getElementById('btn-google').href = buildAuthUrl('google');
+        document.getElementById('btn-facebook').href = buildAuthUrl('facebook');
+      })();
+    </script>
   </body>
 </html>

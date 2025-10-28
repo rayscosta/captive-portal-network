@@ -44,7 +44,8 @@ app.use('/api/assets', assetsRouter)
 app.use('/api/commands', commandsRouter)
 app.use('/api/agent', agentRouter)
 app.use('/api/users', usersRouter)
-app.use('/auth', captiveRouter)
+app.use('/captive', captiveRouter)
+app.use('/auth', captiveRouter)  // Manter compatibilidade com rotas antigas
 
 // Healthcheck
 app.get('/health', (_req, res) => {
