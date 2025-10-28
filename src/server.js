@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
 import { usersRouter } from './routes/users.js'
+import { SessionExpirationService } from './services/SessionExpirationService.js'
 import { TimeoutMonitorService } from './services/TimeoutMonitorService.js'
 
 // Configurações iniciais
@@ -56,6 +57,7 @@ app.get('/health', (_req, res) => {
 // Inicialização do servidor
 const port = process.env.PORT || 3000
 const timeoutMonitor = new TimeoutMonitorService()
+const sessionExpirationMonitor = new SessionExpirationService()
 
 ensureDatabase()
   .then(() => {
@@ -65,6 +67,9 @@ ensureDatabase()
       
       // Iniciar monitor de timeouts de comandos
       timeoutMonitor.start()
+      
+      // Iniciar monitor de sessões expiradas
+      sessionExpirationMonitor.start()
     })
   })
   .catch((err) => {
@@ -76,11 +81,13 @@ ensureDatabase()
 process.on('SIGTERM', () => {
   console.log('SIGTERM recebido, encerrando gracefully...')
   timeoutMonitor.stop()
+  sessionExpirationMonitor.stop()
   process.exit(0)
 })
 
 process.on('SIGINT', () => {
   console.log('\nSIGINT recebido, encerrando gracefully...')
   timeoutMonitor.stop()
+  sessionExpirationMonitor.stop()
   process.exit(0)
 })
