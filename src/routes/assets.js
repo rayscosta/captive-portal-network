@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { AssetController } from '../controllers/AssetController.js'
-import { basicAuthMiddleware } from '../utils/auth.js'
 
 export const assetsRouter = Router()
 const controller = new AssetController()

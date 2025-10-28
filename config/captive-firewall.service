@@ -1,0 +1,15 @@
+[Unit]
+Description=Captive Portal Firewall Rules
+Documentation=https://github.com/rayscosta/captive-portal-network
+After=network.target network-online.target
+Before=captive-portal.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/captive-portal/scripts/setup-captive-firewall.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

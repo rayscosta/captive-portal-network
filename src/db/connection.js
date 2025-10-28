@@ -23,6 +23,8 @@ export const ensureDatabase = () => {
       provider_id TEXT NOT NULL,
       name TEXT,
       email TEXT,
+      password TEXT,
+      role TEXT DEFAULT 'user',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -59,6 +61,7 @@ export const ensureDatabase = () => {
       user_id INTEGER,
       ip TEXT,
       mac TEXT,
+      user_agent TEXT,
       started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       expires_at DATETIME,
       FOREIGN KEY(user_id) REFERENCES users(id)

@@ -1,0 +1,36 @@
+# Configuração de rede para Gateway Captive Portal
+# Localização: /etc/netplan/00-installer-config.yaml
+#
+# INSTRUÇÕES DE INSTALAÇÃO:
+# 1. Identifique suas interfaces de rede com: ip addr show
+# 2. Substitua 'enp1s0' e 'enp2s0' pelos nomes corretos das suas interfaces
+# 3. Copie este arquivo para /etc/netplan/00-installer-config.yaml
+# 4. Execute: sudo netplan try (para testar)
+# 5. Execute: sudo netplan apply (para aplicar permanentemente)
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    # Interface WAN (conectada ao modem para internet)
+    # AJUSTE O NOME DA INTERFACE CONFORME SEU SISTEMA
+    enp1s0:
+      dhcp4: true
+      dhcp6: no
+      optional: true
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+    
+    # Interface LAN (conectada ao AP/switch para rede interna)
+    # AJUSTE O NOME DA INTERFACE CONFORME SEU SISTEMA
+    enp2s0:
+      dhcp4: no
+      dhcp6: no
+      addresses:
+        - 192.168.10.1/24
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4

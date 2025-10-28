@@ -1,11 +1,69 @@
 // Configuração da API
 const API_BASE_URL = '';
-const ADMIN_CREDENTIALS = btoa('admin:change_me'); // Basic Auth
 
 // Estado da aplicação
 let assets = [];
 let commands = [];
 let currentEditingAsset = null;
+
+// Auth Functions
+const getAuthToken = () => localStorage.getItem('admin_token');
+const getAuthUser = () => JSON.parse(localStorage.getItem('admin_user') || 'null');
+
+const checkAuth = async () => {
+    const token = getAuthToken();
+    if (!token) {
+        window.location.href = '/admin/login.html';
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Token inválido');
+        }
+
+        const data = await response.json();
+        if (data.user.role !== 'admin') {
+            showNotification('Acesso negado. Apenas administradores.', 'error');
+            logout();
+            return false;
+        }
+
+        // Atualizar informações do usuário
+        localStorage.setItem('admin_user', JSON.stringify(data.user));
+        updateUserInfo(data.user);
+        return true;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        logout();
+        return false;
+    }
+};
+
+const logout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    window.location.href = '/admin/login.html';
+};
+
+const updateUserInfo = (user) => {
+    // Adicionar informações do usuário no header se houver elemento para isso
+    const userInfoEl = document.getElementById('user-info');
+    if (userInfoEl) {
+        userInfoEl.innerHTML = `
+            <span>${user.name} (${user.email})</span>
+            <button class="btn btn-secondary" onclick="logout()" style="margin-left: 1rem;">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        `;
+    }
+};
 
 // Utility Functions
 const formatDate = (dateString) => {
@@ -16,7 +74,9 @@ const formatDate = (dateString) => {
 const getStatusBadge = (status) => {
     const badges = {
         'PENDING': '<span class="status-badge status-pending">Pendente</span>',
+        'EXECUTING': '<span class="status-badge status-executing">Executando</span>',
         'DONE': '<span class="status-badge status-done">Concluído</span>',
+        'FAILED': '<span class="status-badge status-failed">Falhou</span>',
         'online': '<span class="status-badge status-online">Online</span>',
         'offline': '<span class="status-badge status-offline">Offline</span>'
     };
@@ -32,9 +92,16 @@ const isAssetOnline = (lastSeen) => {
 // API Functions
 const apiRequest = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
+    const token = getAuthToken();
+    
+    if (!token) {
+        logout();
+        throw new Error('Não autenticado');
+    }
+    
     const config = {
         headers: {
-            'Authorization': `Basic ${ADMIN_CREDENTIALS}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
             ...options.headers
         },
@@ -45,7 +112,8 @@ const apiRequest = async (endpoint, options = {}) => {
         const response = await fetch(url, config);
         
         if (response.status === 401) {
-            showNotification('Credenciais inválidas. Verifique usuário e senha.', 'error');
+            showNotification('Sessão expirada. Faça login novamente.', 'error');
+            logout();
             throw new Error('Unauthorized');
         }
         
@@ -348,20 +416,27 @@ const renderCommandsTable = () => {
 const sendCommand = async () => {
     const assetId = document.getElementById('asset-select').value;
     const code = document.getElementById('command-select').value;
+    const timeoutSeconds = parseInt(document.getElementById('timeout-input').value) || 30;
 
     if (!assetId || !code) {
         showNotification('Selecione um ativo e um comando', 'error');
         return;
     }
 
+    if (timeoutSeconds < 5 || timeoutSeconds > 300) {
+        showNotification('Timeout deve estar entre 5 e 300 segundos', 'error');
+        return;
+    }
+
     try {
         await apiRequest('/api/commands', {
             method: 'POST',
-            body: JSON.stringify({ assetId: parseInt(assetId), code })
+            body: JSON.stringify({ assetId: parseInt(assetId), code, timeoutSeconds })
         });
         
         showNotification('Comando enviado com sucesso', 'success');
         document.getElementById('asset-select').value = '';
+        document.getElementById('timeout-input').value = '30';
         loadCommands();
         
         // Update dashboard if visible
@@ -434,6 +509,10 @@ const initEventListeners = () => {
 
 // Initialize App
 const initApp = async () => {
+    // Verificar autenticação antes de inicializar
+    const isAuth = await checkAuth();
+    if (!isAuth) return;
+    
     initEventListeners();
     await loadDashboard();
 };

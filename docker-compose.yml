@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # Aplicação Captive Portal
+  captive-portal:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: captive-portal-app
+    restart: unless-stopped
+    
+    # Network mode host para acesso direto às interfaces de rede
+    # Necessário para iptables e interceptação de tráfego
+    network_mode: host
+    
+    # Capabilities necessárias para iptables
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    
+    # Volumes
+    volumes:
+      # Banco de dados persistente
+      - ./data:/app/data
+      
+      # Scripts shell (montados como executáveis)
+      - ./scripts:/app/scripts:ro
+      
+      # Logs
+      - ./logs:/app/logs
+    
+    # Variáveis de ambiente
+    environment:
+      # Server
+      - NODE_ENV=production
+      - PORT=3000
+      
+      # Database
+      - DATABASE_PATH=/app/data/database.sqlite
+      
+      # Admin Auth (alterar em produção!)
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme123}
+      
+      # OAuth Google
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-http://192.168.10.1:3000/auth/google/callback}
+      
+      # OAuth Facebook
+      - FACEBOOK_APP_ID=${FACEBOOK_APP_ID}
+      - FACEBOOK_APP_SECRET=${FACEBOOK_APP_SECRET}
+      - FACEBOOK_CALLBACK_URL=${FACEBOOK_CALLBACK_URL:-http://192.168.10.1:3000/auth/facebook/callback}
+      
+      # Instagram Redirect
+      - INSTAGRAM_REDIRECT_URL=${INSTAGRAM_REDIRECT_URL:-https://instagram.com/sua_instituicao}
+      
+      # Session
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-secret-in-production}
+      - SESSION_TIMEOUT=${SESSION_TIMEOUT:-3600}
+      
+      # Network Interfaces
+      - WAN_INTERFACE=${WAN_INTERFACE:-eth0}
+      - LAN_INTERFACE=${LAN_INTERFACE:-eth1}
+    
+    # Arquivo de variáveis de ambiente
+    env_file:
+      - .env
+    
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Labels para organização
+    labels:
+      com.captive-portal.service: "main-app"
+      com.captive-portal.version: "1.0.0"
+
+# Volumes nomeados (opcional, se preferir usar volumes Docker em vez de bind mounts)
+volumes:
+  captive-data:
+    driver: local
+  captive-logs:
+    driver: local
+
+# Networks (não usado devido ao network_mode: host, mas mantido para referência)
+networks:
+  captive-network:
+    driver: bridge

@@ -6,6 +6,6 @@
         "cpn-agent": "index.js"
     },
     "dependencies": {
-        "node-fetch": "^3.3.2"
+        "dotenv": "^16.0.0"
     }
 }

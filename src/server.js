@@ -4,13 +4,15 @@ import express from 'express'
 import morgan from 'morgan'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import swaggerUi from 'swagger-ui-express'
-import swaggerSpecs from './config/swagger.js'
 import { ensureDatabase } from './db/connection.js'
 import { agentRouter } from './routes/agent.js'
 import { assetsRouter } from './routes/assets.js'
+import { authRouter } from './routes/auth.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
+import { usersRouter } from './routes/users.js'
+import { SessionExpirationService } from './services/SessionExpirationService.js'
+import { TimeoutMonitorService } from './services/TimeoutMonitorService.js'
 
 // Configurações iniciais
 const app = express()
@@ -23,17 +25,14 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 app.use(express.static(path.join(__dirname, '..', 'public')))
 
-// Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Captive Portal Network API Docs'
-}))
-
 // Rotas principais
+app.use('/api/auth', authRouter)
 app.use('/api/assets', assetsRouter)
 app.use('/api/commands', commandsRouter)
 app.use('/api/agent', agentRouter)
-app.use('/auth', captiveRouter)
+app.use('/api/users', usersRouter)
+app.use('/captive', captiveRouter)
+app.use('/auth', captiveRouter)  // Manter compatibilidade com rotas antigas
 
 /**
  * @swagger
@@ -60,17 +59,14 @@ app.get('/health', (_req, res) => {
 
 // Inicialização do servidor
 const port = process.env.PORT || 3000
-
-try {
-  // Comentário: inicializa o banco de dados de forma síncrona (better-sqlite3)
-  ensureDatabase()
-  
-  app.listen(port, () => {
-    // Comentário: servidor iniciado com sucesso
-    console.log(`Server running on http://localhost:${port}`)
-    console.log(`API Documentation available at http://localhost:${port}/api-docs`)
+ensureDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      // Comentário: servidor iniciado com sucesso
+      console.log(`Server running on http://localhost:${port}`)
+    })
   })
-} catch (err) {
-  console.error('Failed to initialize database', err)
-  process.exit(1)
-}
+  .catch((err) => {
+    console.error('Failed to initialize database', err)
+    process.exit(1)
+  })

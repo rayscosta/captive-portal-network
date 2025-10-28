@@ -1,11 +1,22 @@
 import { Router } from 'express'
 import { execFile } from 'node:child_process'
 import crypto from 'node:crypto'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { getDb } from '../db/connection.js'
 
 const execFileAsync = promisify(execFile)
 export const captiveRouter = Router()
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Comentário: serve página principal do captive portal
+captiveRouter.get('/', (req, res) => {
+  const publicPath = path.join(__dirname, '../../public/index.html')
+  res.sendFile(publicPath)
+})
 
 // Inicia OAuth - cria state vinculado a IP/MAC
 captiveRouter.get('/login/:provider', async (req, res) => {
@@ -29,6 +40,10 @@ captiveRouter.get('/callback', async (req, res) => {
   try {
     const { provider = 'google', state, code, ip, mac } = req.query
     if (!state) return res.status(400).json({ error: 'Missing state' })
+    
+    // Comentário: captura user-agent para rastreamento (RF1.5)
+    const userAgent = req.headers['user-agent'] || 'unknown'
+    
     const db = await getDb()
     const sc = await db.get('SELECT * FROM state_challenges WHERE state = ?', [state])
     if (!sc) {
@@ -49,18 +64,27 @@ captiveRouter.get('/callback', async (req, res) => {
     )
     const userId = userResult.lastID
     const ttlMinutes = Number(process.env.SESSION_TTL_MINUTES || 60)
+    
+    // Comentário: armazena user_agent na sessão conforme RF1.5
     await db.run(
-      'INSERT INTO captive_sessions (user_id, ip, mac, expires_at) VALUES (?, ?, ?, datetime("now", ?))',
-      [userId, ip || sc.ip, mac || sc.mac, `+${ttlMinutes} minutes`]
+      'INSERT INTO captive_sessions (user_id, ip, mac, user_agent, expires_at) VALUES (?, ?, ?, ?, datetime("now", ?))',
+      [userId, ip || sc.ip, mac || sc.mac, userAgent, `+${ttlMinutes} minutes`]
     )
 
-    // Executa script shell para liberar acesso
+    // Executa script shell para liberar acesso (apenas MAC)
     const scriptPath = 'scripts/allow_internet.sh'
-    try {
-      await execFileAsync(scriptPath, [ip || sc.ip || '', mac || sc.mac || ''])
-    } catch (scriptErr) {
-      // Log mas não falhar o fluxo de usuário
-      console.error('Script error:', scriptErr?.stderr || scriptErr?.message)
+    const macAddress = mac || sc.mac
+    
+    if (macAddress) {
+      try {
+        await execFileAsync(scriptPath, [macAddress])
+        console.log(`[ALLOW] Acesso liberado para MAC: ${macAddress}`)
+      } catch (scriptErr) {
+        // Log mas não falhar o fluxo de usuário
+        console.error('Script error:', scriptErr?.stderr || scriptErr?.message)
+      }
+    } else {
+      console.warn('[WARN] MAC address não disponível, não foi possível liberar acesso')
     }
 
     await db.run('DELETE FROM state_challenges WHERE state = ?', [state])
