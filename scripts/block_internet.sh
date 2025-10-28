@@ -1,43 +1,40 @@
 #!/usr/bin/env bash
-# Comentário: Script para bloquear acesso à internet (reverso do allow_internet.sh)
-# Uso: ./block_internet.sh <ip> <mac>
+# Script para bloquear acesso à internet de um cliente (sessão expirada)
+# Uso: ./block_internet.sh <MAC_ADDRESS>
 set -euo pipefail
 
-ip="${1:-}"
-mac="${2:-}"
+MAC="${1:-}"
+COMMENT="captive-user-${MAC}"
 
-echo "[BLOCK] Bloqueando acesso para IP=$ip MAC=$mac" >&2
-
-# Comentário: validação de parâmetros
-if [[ -z "$ip" ]] && [[ -z "$mac" ]]; then
-  echo "[BLOCK] Erro: É necessário fornecer IP ou MAC" >&2
-  exit 1
+if [ -z "$MAC" ]; then
+    echo "Erro: Endereço MAC não fornecido"
+    echo "Uso: $0 <MAC_ADDRESS>"
+    exit 1
 fi
 
-# Comentário: exemplo de comandos iptables para bloquear acesso
-# IMPORTANTE: Adapte conforme sua configuração de rede/gateway
-#
-# Exemplo para gateway/router Linux com iptables:
-#
-# 1. Remove regras de ACCEPT que foram criadas pelo allow_internet.sh
-# if [[ -n "$ip" ]]; then
-#   iptables -D FORWARD -s "$ip" -j ACCEPT 2>/dev/null || true
-#   iptables -D FORWARD -d "$ip" -j ACCEPT 2>/dev/null || true
-# fi
-#
-# if [[ -n "$mac" ]]; then
-#   iptables -D FORWARD -m mac --mac-source "$mac" -j ACCEPT 2>/dev/null || true
-# fi
-#
-# 2. Adiciona regra de redirect para captive portal (HTTP)
-# if [[ -n "$ip" ]]; then
-#   iptables -t nat -I PREROUTING -s "$ip" -p tcp --dport 80 -j DNAT --to-destination <GATEWAY_IP>:3000
-# fi
-#
-# 3. Bloqueia HTTPS (ou redireciona para aviso)
-# if [[ -n "$ip" ]]; then
-#   iptables -I FORWARD -s "$ip" -p tcp --dport 443 -j DROP
-# fi
+# Validar formato do MAC (básico)
+if ! echo "$MAC" | grep -qE '^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$'; then
+    echo "Erro: Formato de MAC inválido: $MAC"
+    echo "Formato esperado: XX:XX:XX:XX:XX:XX"
+    exit 1
+fi
 
-echo "[BLOCK] Bloqueio aplicado (placeholder - implementar iptables)" >&2
+# Verificar se existe uma regra para este MAC
+if ! iptables -C FORWARD -m mac --mac-source "$MAC" -j ACCEPT -m comment --comment "$COMMENT" 2>/dev/null; then
+    echo "Não há regra ativa para MAC: $MAC"
+    exit 0
+fi
+
+# Remover regra de FORWARD para este MAC
+iptables -D FORWARD -m mac --mac-source "$MAC" -j ACCEPT -m comment --comment "$COMMENT" 2>/dev/null || {
+    echo "Erro ao remover regra para MAC: $MAC"
+    exit 1
+}
+
+echo "[BLOCK] Acesso bloqueado para MAC: $MAC"
+
+# Log para auditoria
+logger -t captive-portal "Acesso bloqueado para MAC: $MAC (sessão expirada)"
+
 exit 0
+

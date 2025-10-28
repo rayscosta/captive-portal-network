@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import 'dotenv/config'
-import os from 'node:os'
 import { spawn } from 'node:child_process'
 
 const serverBaseUrl = process.env.SERVER_BASE_URL || 'http://localhost:3000'

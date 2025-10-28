@@ -60,14 +60,16 @@ export class SessionExpirationService {
             [session.id]
           )
 
-          // Executar script de bloqueio
+          // Executar script de bloqueio (apenas MAC)
           const scriptPath = 'scripts/block_internet.sh'
-          await execFileAsync(scriptPath, [
-            session.ip || '',
-            session.mac || ''
-          ])
-
-          console.log(`🔒 Sessão #${session.id} expirada e bloqueada (IP: ${session.ip}, MAC: ${session.mac})`)
+          const macAddress = session.mac
+          
+          if (macAddress) {
+            await execFileAsync(scriptPath, [macAddress])
+            console.log(`🔒 Sessão #${session.id} expirada e bloqueada (MAC: ${macAddress})`)
+          } else {
+            console.warn(`⚠️ Sessão #${session.id} sem MAC address, não foi possível bloquear`)
+          }
         } catch (scriptErr) {
           console.error(`❌ Erro ao bloquear sessão #${session.id}:`, scriptErr.message)
         }

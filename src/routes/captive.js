@@ -71,13 +71,20 @@ captiveRouter.get('/callback', async (req, res) => {
       [userId, ip || sc.ip, mac || sc.mac, userAgent, `+${ttlMinutes} minutes`]
     )
 
-    // Executa script shell para liberar acesso
+    // Executa script shell para liberar acesso (apenas MAC)
     const scriptPath = 'scripts/allow_internet.sh'
-    try {
-      await execFileAsync(scriptPath, [ip || sc.ip || '', mac || sc.mac || ''])
-    } catch (scriptErr) {
-      // Log mas não falhar o fluxo de usuário
-      console.error('Script error:', scriptErr?.stderr || scriptErr?.message)
+    const macAddress = mac || sc.mac
+    
+    if (macAddress) {
+      try {
+        await execFileAsync(scriptPath, [macAddress])
+        console.log(`[ALLOW] Acesso liberado para MAC: ${macAddress}`)
+      } catch (scriptErr) {
+        // Log mas não falhar o fluxo de usuário
+        console.error('Script error:', scriptErr?.stderr || scriptErr?.message)
+      }
+    } else {
+      console.warn('[WARN] MAC address não disponível, não foi possível liberar acesso')
     }
 
     await db.run('DELETE FROM state_challenges WHERE state = ?', [state])
