@@ -11,8 +11,7 @@ import { authRouter } from './routes/auth.js'
 import { captiveRouter } from './routes/captive.js'
 import { commandsRouter } from './routes/commands.js'
 import { usersRouter } from './routes/users.js'
-import { SessionExpirationService } from './services/SessionExpirationService.js'
-import { TimeoutMonitorService } from './services/TimeoutMonitorService.js'
+import { logOAuthConfig } from './utils/oauth.js'
 
 // Configurações iniciais
 const app = express()
@@ -59,14 +58,20 @@ app.get('/health', (_req, res) => {
 
 // Inicialização do servidor
 const port = process.env.PORT || 3000
-ensureDatabase()
-  .then(() => {
-    app.listen(port, () => {
-      // Comentário: servidor iniciado com sucesso
-      console.log(`Server running on http://localhost:${port}`)
-    })
+
+try {
+  // Comentário: inicializa database de forma síncrona (better-sqlite3)
+  ensureDatabase()
+  
+  app.listen(port, () => {
+    // Comentário: servidor iniciado com sucesso
+    console.log(`🚀 Server running on http://localhost:${port}`)
+    console.log(`📚 API Docs: http://localhost:${port}/api-docs`)
+    
+    // Comentário: exibe configuração OAuth
+    logOAuthConfig()
   })
-  .catch((err) => {
-    console.error('Failed to initialize database', err)
-    process.exit(1)
-  })
+} catch (err) {
+  console.error('Failed to initialize database', err)
+  process.exit(1)
+}

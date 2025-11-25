@@ -45,6 +45,9 @@ Após iniciar o servidor, a documentação interativa da API, gerada pelo Swagge
     ```bash
     cp .env.example .env
     ```
+    
+    > **⚠️ Importante para OAuth**: Se você estiver desenvolvendo localmente, precisa usar um túnel público (como ngrok) para que o OAuth funcione. Veja o [Guia Rápido OAuth](OAUTH-QUICKSTART.md) para instruções passo-a-passo.
+
 3.  Instale as dependências:
     ```bash
     npm install
@@ -65,6 +68,19 @@ Para rodar o servidor com reinicialização automática (`nodemon`):
 ```bash
 npm run dev
 ```
+
+**Para desenvolvimento com OAuth (recomendado):**
+
+Use um túnel público para expor seu servidor local:
+```bash
+# Terminal 1 - Inicie o túnel
+npm run tunnel
+
+# Terminal 2 - Inicie o servidor
+npm run dev
+```
+
+Veja o [Guia Rápido OAuth](OAUTH-QUICKSTART.md) para configuração completa.
 
 #### Ambiente de Produção
 É altamente recomendado usar um gerenciador de processos como o **PM2**.

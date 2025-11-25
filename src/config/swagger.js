@@ -5,32 +5,19 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'Captive Portal Network API',
-<<<<<<< HEAD
       version: '0.1.0',
       description: 'Academic system for IT asset management and captive portal with social authentication. Provides endpoints for managing network assets, executing remote commands via agents, and handling captive portal authentication flows.',
       contact: {
-        name: 'Group Support',
-        email: 'rhmg@pm.me'
+        name: 'API Support',
+        email: 'support@captiveportal.local'
       },
       license: {
         name: 'Private',
-=======
-      version: '1.0.0',
-      description: 'Sistema acadêmico de gerenciamento de ativos de TI e captive portal com autenticação social',
-      contact: {
-        name: 'API Support',
-        email: 'support@cpn.com'
-      },
-      license: {
-        name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
->>>>>>> cbe560962a758bcacedd1205005f964757c3f938
       }
     },
     servers: [
       {
         url: 'http://localhost:3000',
-<<<<<<< HEAD
         description: 'Development server'
       },
       {
@@ -58,13 +45,6 @@ const options = {
       {
         name: 'Health',
         description: 'System health check'
-=======
-        description: 'Servidor de Desenvolvimento'
-      },
-      {
-        url: 'https://api.cpn.com',
-        description: 'Servidor de Produção'
->>>>>>> cbe560962a758bcacedd1205005f964757c3f938
       }
     ],
     components: {
@@ -72,22 +52,14 @@ const options = {
         BearerAuth: {
           type: 'http',
           scheme: 'bearer',
-<<<<<<< HEAD
-          bearerFormat: 'JWT'
-=======
           bearerFormat: 'JWT',
-          description: 'Token JWT para autenticação de administradores'
->>>>>>> cbe560962a758bcacedd1205005f964757c3f938
+          description: 'JWT token for admin authentication'
         },
         AgentToken: {
           type: 'apiKey',
           in: 'header',
           name: 'X-Agent-Token',
-<<<<<<< HEAD
           description: 'Agent authentication token'
-=======
-          description: 'Token único do agente para autenticação'
->>>>>>> cbe560962a758bcacedd1205005f964757c3f938
         }
       },
       schemas: {
